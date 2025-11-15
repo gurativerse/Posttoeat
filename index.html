@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POST TO EAT - ไปรกินข้าวด้วยกัน</title>
+    <link rel="icon" type="image/png" href="https://img.rdcw.co.th/images/c24fcf8ecffc5355d6af9716998a898dbe9ce299a1ab2f8692c1a782c88f87a2.png">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Global Styles based on provided images --- */
+        :root {
+            --primary-red: #E72733; /* Exact red from buttons and logo */
+            --light-red: #F87B6A; /* Lighter red for text elements */
+            --text-dark: #333333;
+            --text-light-gray: #777777;
+            --input-border: #CCCCCC;
+            --background-light: #F8F8F8; /* Overall light background */
+            --white: #FFFFFF;
+            --border-radius-main: 10px;
+            --border-radius-button: 30px; /* More rounded buttons */
+            --border-radius-input: 5px; /* Subtle input border radius */
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Kanit', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 24px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90vh;
+            width: 100%;
+        }
+        
+        /* --- Main App Container --- */
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--white);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: var(--border-radius-main);
+            overflow: hidden;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header for Authenticated Pages (Image 4, 6, 3) --- */
+        .auth-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: var(--white);
+            border-bottom: 1px solid #eee;
+        }
+        .auth-header .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+        .auth-header .logo img {
+            height: 40px;
+            margin-right: 5px;
+        }
+        .auth-header .btn-logout {
+            background-color: #f0f0f0;
+            color: var(--text-dark);
+            border: 1px solid #ccc;
+            padding: 8px 15px;
+            border-radius: var(--border-radius-button);
+            cursor: pointer;
+            font-size: 0.9em;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        /* --- Content Area --- */
+        .content {
+            padding: 40px 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .content > .page-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        /* --- Login/Signup Styles (Image 1, 5) --- */
+        .auth-page-logo-container {
+            text-align: center;
+        }
+        .auth-page-logo-container img {
+            width: 150px;
+            /* Placeholder styling for logo image */
+            height: 150px;
+        }
+        .auth-page-slogan {
+            text-align: center;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            color: #162067;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--input-border);
+            border-radius: 40px;
+            font-size: 1em;
+            background-color: #F7F7F7; 
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .form-group select[multiple] {
+            border-radius: var(--border-radius-input);
+            padding: 8px;
+            min-height: 100px;
+        }
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+        }
+        .food-checkbox-container {
+            border: 1px solid var(--input-border);
+            border-radius: var(--border-radius-input);
+            padding: 12px;
+            background-color: #F7F7F7;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+        .checkbox-label:hover {
+            background-color: #EEEEEE;
+        }
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .checkbox-label span {
+            font-size: 1em;
+            color: var(--text-dark);
+        }
+        .food-summary {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #E8F4F8;
+            border: 1px solid #B8D4E3;
+            border-radius: var(--border-radius-input);
+            font-size: 0.95em;
+        }
+        .food-summary strong {
+            color: var(--primary-red);
+        }
+        .food-summary span {
+            color: var(--text-dark);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: var(--border-radius-button);
+            font-size: 1.2em;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 500;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: var(--white);
+        }
+        .btn-primary, .btn-secondary {
+            background-color: var(--primary-red);
+            margin-top: 30px;
+        }
+        .link-text {
+            display: block;
+            margin-top: 15px;
+            text-align: center;
+            color: rgba(22, 32, 103, 1);
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        /* --- Authenticated Page Navigation Tabs (Image 4, 6) --- */
+        .tab-nav {
+            display: flex;
+            background-color: var(--white);
+            border-bottom: 1px solid #eee;
+            margin-top: 0;
+            overflow-x: auto;
+        }
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--text-light-gray);
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            min-width: 0;
+            transition: color 0.2s;
+        }
+        .tab-item:hover {
+            color: var(--primary-red);
+        }
+        .tab-item.active {
+            color: var(--primary-red);
+            border-bottom-color: var(--primary-red);
+            font-weight: 700;
+        }
+        .tab-content {
+            padding: 20px 10px; /* Reduced padding for restaurant grid */
+            background-color: var(--white);
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .page-container[data-page="chat"] {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+        }
+
+        /* --- Dashboard (Restaurant List) Styling (Image 4) --- */
+        .restaurant-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .restaurant-card {
+            background-color: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .restaurant-card img {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            /* Placeholder for restaurant image */
+            background-color: #FFC0CB; 
+        }
+        .restaurant-card h3 {
+            margin: 0 0 3px;
+            color: var(--text-dark);
+            font-size: 0.9em;
+            line-height: 1.2;
+        }
+        .restaurant-card p {
+            margin: 0;
+            font-size: 0.75em;
+            color: var(--text-light-gray);
+        }
+        .restaurant-card button {
+            background-color: #E72733;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+
+        /* --- Find Friend Styling (Image 6, Mascot) --- */
+        .mascot-container {
+            text-align: center;
+            margin: 8px 0;
+        }
+        .mascot-container img {
+            width: 150px; /* Mascot size */
+            /* Placeholder styling for mascot image */
+        }
+        .mascot-container p {
+            font-size: 1em;
+            color: #162067;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .current-matches {
+            margin-top: 20px;
+        }
+        .match-item {
+            background-color: #F8F8F8;
+            border: 1px solid #eee;
+            border-radius: var(--border-radius-main);
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95em;
+        }
+        .friend-name {
+            font-weight: 700;
+            color: var(--primary-red);
+            font-size: 1em;
+        }
+
+        /* --- Chat Styling (Image 2) --- */
+        .chat-name {
+            font-weight: 700;
+            color: var(--primary-red);
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        .chat-page-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 0;
+        }
+        .chat-box {
+            flex: 1;
+            min-height: 0;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius-main);
+            padding: 20px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background-color: #FDFDFD;
+        }
+        .chat-box::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-box::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .chat-box::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+        .chat-box::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+        .message {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+        .message.sent {
+            align-self: flex-end;
+            background-color: #E0EFFF; /* Light blue */
+            color: var(--text-dark);
+        }
+        .message.received {
+            align-self: flex-start;
+            background-color: #EEE;
+            color: var(--text-dark);
+        }
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input-area input {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 1px solid var(--input-border);
+            border-radius: 40px;
+            font-size: 1em;
+            background-color: #F7F7F7;
+        }
+        .chat-input-area input:focus {
+            outline: none;
+            border-color: var(--primary-red);
+        }
+        .chat-input-area .btn-send {
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--border-radius-button);
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        /* --- Profile Styling (Image 3) --- */
+        .profile-card {
+            text-align: center;
+            background-color: #f7f7f7;
+            padding: 20px;
+            border-radius: var(--border-radius-main);
+            margin-bottom: 8px;
+        }
+        .profile-card i {
+            font-size: 5em;
+            color: var(--light-red);
+        }
+        .profile-section {
+            margin-top: 8px;
+        }
+        .profile-section h3 {
+            color: var(--text-dark);
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+        .profile-detail {
+            margin-bottom: 8px;
+        }
+        .profile-detail label {
+            display: block;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+        .profile-detail p {
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        /* --- Utility --- */
+        .hidden { display: none !important; }
+        .error { 
+            color: var(--primary-red); 
+            margin-top: 10px; 
+            text-align: center; 
+            font-weight: 700; 
+            font-size: 0.9em;
+        }
+
+        /* --- Responsive Layout Adjustments --- */
+        @media (min-width: 600px) {
+            .app-container {
+                max-width: 560px;
+            }
+            .content {
+                padding: 40px 32px;
+            }
+            .restaurant-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 900px) {
+            body {
+                padding: 32px 0;
+            }
+            .app-container {
+                max-width: 640px;
+            }
+            .content {
+                padding: 40px 36px;
+            }
+            .restaurant-list {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 18px;
+            }
+            .mascot-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .mascot-container img {
+                width: 160px;
+            }
+            .tab-nav {
+                justify-content: center;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <div id="app-header-area"></div>
+        
+        <div class="content" id="app-content"></div>
+    </div>
+
+    <script>
+        /**
+         * Post To Eat - Food Matching Application
+         * 
+         * Application Structure:
+         * 1. Constants & Configuration
+         * 2. Data Models (Users, Restaurants, Matches, Chat History)
+         * 3. State Management
+         * 4. Session Management (localStorage-based)
+         * 5. Utility Functions
+         * 6. Component Functions (UI Rendering)
+         * 7. Navigation & Flow Control
+         * 8. Initialization
+         */
+
+        // ============================================
+        // 1. CONSTANTS & CONFIGURATION
+        // ============================================
+        
+        // Image URLs
+        const LOGO_SRC = "https://img.rdcw.co.th/images/c24fcf8ecffc5355d6af9716998a898dbe9ce299a1ab2f8692c1a782c88f87a2.png"; 
+        const MASCOT_SRC = "https://img.rdcw.co.th/images/f584ad97783488f00652eb6edfff9f638e8b12beece96fc58d5923569e4ea0cf.png";
+        const RestaurantImage = "https://img.rdcw.co.th/images/4e3ddf4c7c55bae746b399186a9408cfb205f0b8a7dfc70a6688df13603548f3.jpeg";
+        
+        // Session timeout: 5 minutes (300000 milliseconds)
+        const SESSION_TIMEOUT = 5 * 60 * 1000;
+        
+        // Food options for preferences
+        const FOOD_OPTIONS = ['อาหารไทย','อาหารจีน', 'อาหารญี่ปุ่น', 'อาหารเกาหลี','อาหารอิตาเลียน', 'ก๋วยเตี๋ยว', 'ปิ้งย่าง', 'ชาบู', 'ของหวาน', 'เครื่องดื่ม'];
+
+        // ============================================
+        // 2. DATA MODELS
+        // ============================================
+
+        // User Data (INSECURE - FOR DEMO ONLY)
+        const USERS = [
+            { id: 1, password: 'password123', name: 'อาเบล เหลี่ยมทุกวัน', employeeId: '65123', foodPreference: 'อาหารไทย, อาหารญี่ปุ่น', email: 'abeljoker@example.com' },
+            { id: 2, password: 'demo', name: 'อาเบล รักสุรา', employeeId: '65124', foodPreference: 'อาหารญี่ปุ่น, ของหวาน', email: 'abellovealcohol@example.com' }
+        ];
+
+        // Restaurant Data
+        const RESTAURANTS = [
+            { id: 1, name: 'Lucky Suki - Charn at the avenue', type: 'ชาบู', distance: '1.9 km', rating: '4.2', image: RestaurantImage, map: 'https://maps.app.goo.gl/EsnKtES5zd5wueWB6' },
+            { id: 2, name: 'ธง หมูกระทะ', type: 'ปิ้งย่าง', distance: '1.8 km', rating: '4.9', image: RestaurantImage, map: 'https://maps.app.goo.gl/G49sFnNchNQW2LHb8' },
+            { id: 3, name: 'Red Panda Yakiniku (Chaeng Wattana)', type: 'ปิ้งย่าง', distance: '1.9 km', rating: '4.8', image: RestaurantImage, map:'https://maps.app.goo.gl/xEz3e5rqTY4znxku6' },
+            { id: 4, name: 'ฉ่ำ ส้มตำถาด สาขาแจ้งวัฒนะ', type: 'อาหารไทย', distance: '1.7 km', rating: '4.0', image: RestaurantImage, map:'https://maps.app.goo.gl/FE2RiRUjDBVgzQ1v8' },
+            { id: 5, name: 'ร้านส้มตำไทญ้อ แซ่บเวอร์', type: 'อาหารไทย', distance: '0.9 km', rating: '4.3', image: RestaurantImage, map:'https://maps.app.goo.gl/pYG18PP85ogx5bww6' },
+            { id: 6, name: 'ข้าวมันไก่กวางเจา', type: 'อาหารไทย', distance: '1.0 km', rating: '3.5', image: RestaurantImage, map:'https://maps.app.goo.gl/6uLnT4zXFwq8CeiGA' },
+            { id: 7, name: 'Man Fu Yuan', type: 'อาหารจีน', distance: '1.4 km', rating: '4.5', image: RestaurantImage, map:'https://maps.app.goo.gl/h3FCQQwzaJ9RSTwb9' },
+            { id: 8, name: 'Vara Cake', type: 'ของหวาน', distance: '1.2 km', rating: '4.6', image: RestaurantImage, map:'https://maps.app.goo.gl/J5skwDbcPGv1nYB99' },
+            { id: 9, name: 'KAMU KAMU', type: 'เครื่องดื่ม', distance: '1.6 km', rating: '5.0', image: RestaurantImage, map:'https://maps.app.goo.gl/HyN3msjqhFxV1xGE7' },
+            { id: 10, name: 'Yayoi โลตัสหลักสี่', type: 'อาหารญี่ปุ่น', distance: '3.8 km', rating: '3.8', image: RestaurantImage, map:'https://maps.app.goo.gl/3uEq3TAFrawcrQe26' },
+        ];
+
+        // Match Data (for "หาเพื่อนกินข้าว" tab)
+        const MATCHES = [
+            { id: 101, requester: 'สมชาย สุขจะกิน', code: 'XXX', foodPreference: 'อาหารญี่ปุ่น, อาหารเกาหลี', status: 'รอนัดหมาย' },
+            { id: 102, requester: 'หญิงรัตน์ หวังกิน', code: 'YYY', foodPreference: 'ของหวาน, อาหารไทย, อาหารอิตาเลียน', status: 'นัดหมายแล้ว' }
+        ];
+
+        // Chat History Data
+        const CHAT_HISTORY = [
+            {
+                id: 1,
+                friendId: 102,
+                friendName: 'หญิงรัตน์ หวังกิน',
+                lastMessage: 'โอเคเลยครับ เจอกันที่ร้าน 12:30 นะครับ',
+                lastMessageTime: '12:30',
+                messages: [
+                    { type: 'received', text: 'สวัสดีค่ะ อยากกินอะไรหรือสนใจร้านไหนเป็นพิเศษไหมคะ?', time: '12:25' },
+                    { type: 'sent', text: 'สวัสดีครับ! สนใจร้าน ' + RESTAURANTS[1].name + ' ครับ/ค่ะ', time: '12:26' },
+                    { type: 'received', text: 'โอเคเลยค่ะ เจอกันที่ร้าน 18:30 นะคะ', time: '12:30' }
+                ]
+            }
+        ];
+
+        // ============================================
+        // 3. STATE MANAGEMENT
+        // ============================================
+        
+        let isAuthenticated = false;
+        let currentUser = null;
+        let currentChatId = null;
+        
+        // DOM References
+        const appContent = document.getElementById('app-content');
+        const appHeaderArea = document.getElementById('app-header-area');
+
+        // ============================================
+        // 4. SESSION MANAGEMENT
+        // ============================================
+        
+        /**
+         * Save user session to localStorage
+         * @param {Object} user - User object to save
+         */
+        function saveSession(user) {
+            const sessionData = {
+                user: user,
+                lastActivity: Date.now()
+            };
+            localStorage.setItem('postToEatSession', JSON.stringify(sessionData));
+        }
+        
+        /**
+         * Load session from localStorage and validate
+         * @returns {boolean} True if valid session exists, false otherwise
+         */
+        function loadSession() {
+            const sessionData = localStorage.getItem('postToEatSession');
+            if (!sessionData) return false;
+            
+            try {
+                const data = JSON.parse(sessionData);
+                const now = Date.now();
+                const timeSinceLastActivity = now - data.lastActivity;
+                
+                // Check if session is still valid (less than 5 minutes)
+                if (timeSinceLastActivity < SESSION_TIMEOUT) {
+                    isAuthenticated = true;
+                    currentUser = data.user;
+                    updateLastActivity(); // Update activity time
+                    return true;
+                } else {
+                    // Session expired, clear it
+                    clearSession();
+                    return false;
+                }
+            } catch (e) {
+                clearSession();
+                return false;
+            }
+        }
+        
+        /**
+         * Clear session from localStorage and reset state
+         */
+        function clearSession() {
+            localStorage.removeItem('postToEatSession');
+            isAuthenticated = false;
+            currentUser = null;
+        }
+        
+        /**
+         * Update last activity timestamp in session
+         */
+        function updateLastActivity() {
+            const sessionData = localStorage.getItem('postToEatSession');
+            if (sessionData) {
+                try {
+                    const data = JSON.parse(sessionData);
+                    data.lastActivity = Date.now();
+                    localStorage.setItem('postToEatSession', JSON.stringify(data));
+                } catch (e) {
+                    clearSession();
+                }
+            }
+        }
+        
+        /**
+         * Check if session has timed out and logout if expired
+         */
+        function checkSessionTimeout() {
+            const sessionData = localStorage.getItem('postToEatSession');
+            if (!sessionData) return;
+            
+            try {
+                const data = JSON.parse(sessionData);
+                const now = Date.now();
+                const timeSinceLastActivity = now - data.lastActivity;
+                
+                if (timeSinceLastActivity >= SESSION_TIMEOUT) {
+                    // Session expired
+                    clearSession();
+                    if (isAuthenticated) {
+                        handleLogout();
+                        alert('เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง');
+                    }
+                }
+            } catch (e) {
+                clearSession();
+            }
+        }
+        
+        /**
+         * Track user activity to update last activity time
+         */
+        function setupActivityTracking() {
+            const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+            events.forEach(event => {
+                document.addEventListener(event, updateLastActivity, { passive: true });
+            });
+        }
+        
+        /**
+         * Check session timeout every minute
+         */
+        function startSessionMonitor() {
+            setInterval(checkSessionTimeout, 60000); // Check every minute
+        }
+
+        // ============================================
+        // 5. UTILITY FUNCTIONS
+        // ============================================
+        
+        /**
+         * Render component and update header/navigation
+         * @param {string} htmlContent - HTML content to render
+         * @param {string} headerMode - Header mode ('logo' or 'auth')
+         * @param {string} activeTab - Active tab name for navigation
+         */
+        function renderComponent(htmlContent, headerMode = 'logo', activeTab = 'find-friend') {
+            appContent.innerHTML = htmlContent;
+            appHeaderArea.innerHTML = ''; 
+
+            if (headerMode === 'auth') {
+                // Header for authenticated pages (Logo top-left, Logout top-right)
+                appHeaderArea.innerHTML = `
+                    <div class="auth-header">
+                        <div class="logo" style="gap: 4px; cursor: pointer;" onclick="navigate('profile')">
+                            <img src="${LOGO_SRC}" alt="Logo">
+                            POST TO EAT
+                        </div>
+                        <a href="#" class="btn-logout" onclick="handleLogout(); return false;">ออกจากระบบ</a>
+                    </div>
+                    <div class="tab-nav">
+                        <div class="tab-item ${activeTab === 'find-friend' ? 'active' : ''}" 
+                             onclick="navigate('find-friend')">
+                             หาเพื่อนกินข้าว
+                        </div>
+                        <div class="tab-item ${activeTab === 'restaurants' ? 'active' : ''}" 
+                             onclick="navigate('restaurants')">
+                             หาร้านกินข้าว
+                        </div>
+                        <div class="tab-item ${activeTab === 'profile' ? 'active' : ''}" 
+                             onclick="navigate('profile')">
+                             โปรไฟล์
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        /**
+         * Render restaurant list into container
+         * @param {Array} restaurants - Restaurants to render
+         */
+        function renderRestaurantList(restaurants) {
+            const container = document.getElementById('restaurant-list-container');
+            if (!container) return;
+
+            if (!restaurants.length) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-light-gray);">ไม่พบร้านอาหารที่ตรงกับการค้นหา</p>';
+                return;
+            }
+
+            container.innerHTML = restaurants.map(r => `
+                <div class="restaurant-card">
+                    <img src="${r.image}" alt="${r.name} Image">
+                    <h3>${r.name}</h3>
+                    <p>${r.type} | ${r.distance}</p>
+                    <p style="font-size: 0.8em; color: #F2B418;">⭐ ${r.rating}</p>
+                    <a href="${r.map}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #E72733; color: white; border: none; padding: 5px 10px; border-radius: 20px; font-size: 0.7em; margin-top: 5px; cursor: pointer; text-decoration: none; text-align: center;">ดูโลเคชั่น</a>
+                </div>
+            `).join('');
+        }
+
+        /**
+         * Setup restaurant search filtering
+         */
+        function setupRestaurantSearch() {
+            const searchInput = document.getElementById('restaurant-search-input');
+            if (!searchInput) return;
+
+            searchInput.addEventListener('input', (event) => {
+                const query = event.target.value.toLowerCase().trim();
+                if (!query) {
+                    renderRestaurantList(RESTAURANTS);
+                    return;
+                }
+
+                const filtered = RESTAURANTS.filter(r =>
+                    r.name.toLowerCase().includes(query) ||
+                    r.type.toLowerCase().includes(query)
+                );
+                renderRestaurantList(filtered);
+            });
+        }
+
+        /**
+         * Render match list into container
+         * @param {Array} matches - Matches to render
+         */
+        function renderMatchList(matches) {
+            const container = document.getElementById('match-list-container');
+            if (!container) return;
+
+            if (!matches.length) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-light-gray);">ไม่พบเพื่อนที่ตรงกับการค้นหา</p>';
+                return;
+            }
+
+            container.innerHTML = matches.map(m => {
+                let buttonHtml = '';
+                if (m.status === 'นัดหมายแล้ว') {
+                    const chat = CHAT_HISTORY.find(c => c.friendId === m.id);
+                    buttonHtml = chat
+                        ? `<button style="background: #38C0B7; color: white; border: none; padding: 5px 10px; border-radius: 20px; font-size: 0.7em; margin-top: 5px; cursor: pointer;" onclick="navigate('chat', ${chat.id})">แชท</button>`
+                        : `<button style="background: #38C0B7; color: white; border: none; padding: 5px 10px; border-radius: 20px; font-size: 0.7em; margin-top: 5px; cursor: pointer;" onclick="navigate('profile')">แชท</button>`;
+                } else {
+                    buttonHtml = `<button style="background: var(--primary-red); color: white; border: none; padding: 5px 10px; border-radius: 20px; font-size: 0.7em; margin-top: 5px; cursor: pointer;" onclick="navigate('new-match')">หาคู่กินข้าว</button>`;
+                }
+
+                return `
+                    <div class="match-item">
+                        <div>
+                            <span class="friend-name">${m.requester}</span> <br>
+                            <span style="font-size: 0.8em;">ชอบ: ${m.foodPreference}</span>
+                        </div>
+                        <div style="text-align: right;">
+                            <span class="status" style="color: ${m.status === 'นัดหมายแล้ว' ? '#38C0B7' : '#E72733'};">${m.status}</span>
+                            <br>
+                            ${buttonHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /**
+         * Setup match/friend search filtering
+         */
+        function setupMatchSearch() {
+            const searchInput = document.getElementById('friend-search-input');
+            if (!searchInput) return;
+
+            searchInput.addEventListener('input', (event) => {
+                const query = event.target.value.toLowerCase().trim();
+                if (!query) {
+                    renderMatchList(MATCHES);
+                    return;
+                }
+
+                const filtered = MATCHES.filter(m => {
+                    const requester = m.requester ? m.requester.toLowerCase() : '';
+                    const preference = m.foodPreference ? m.foodPreference.toLowerCase() : '';
+                    const status = m.status ? m.status.toLowerCase() : '';
+                    return requester.includes(query) || preference.includes(query) || status.includes(query);
+                });
+                renderMatchList(filtered);
+            });
+        }
+
+        // ============================================
+        // 6. COMPONENT FUNCTIONS (UI RENDERING)
+        // ============================================
+        
+        /**
+         * Show login page
+         * @param {string} message - Error message to display (optional)
+         */
+        function showLogin(message = '') {
+            renderComponent('', 'logo'); // Clear header and nav
+
+            const html = `
+                <div class="page-container" data-page="login">
+                    <div class="auth-page-logo-container">
+                        <img src="${LOGO_SRC}" alt="Post To Eat Logo">
+                    </div>
+                    <p class="auth-page-slogan">เพราะเราเข้าใจ ว่าคุณ<span style="color: #EE1B24;">หิวข้าว</span></p>
+                    ${message ? `<p class="error">${message}</p>` : ''}
+                    <div class="form-group">
+                        <label for="login-username">รหัสพนักงาน</label>
+                        <input type="text" id="login-username" placeholder="กรุณากรอกรหัสพนักงานที่นี่" required onkeydown="if(event.key === 'Enter') { document.getElementById('login-password').focus(); }">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">รหัสผ่าน</label>
+                        <input type="password" id="login-password" placeholder="กรุณากรอกรหัสผ่าน" required onkeydown="if(event.key === 'Enter') { handleLogin(); }">
+                    </div>
+                    <button class="btn btn-primary" onclick="handleLogin()">เข้าสู่ระบบ</button>
+                    <a class="link-text" onclick="showSignup()"><span style="color: #777777;">มีบัญชีอยู่แล้ว?</span> สมัครสมาชิกที่นี่</a>
+                </div>
+            `;
+            appContent.innerHTML = html;
+        }
+
+        /**
+         * Handle login submission
+         */
+        function handleLogin() {
+            const empIDInput = document.getElementById('login-username');
+            const passwordInput = document.getElementById('login-password');
+            
+            if (!empIDInput || !passwordInput) {
+                showLogin('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+                return;
+            }
+            
+            const empID = empIDInput.value.trim();
+            const password = passwordInput.value;
+            
+            if (!empID || !password) {
+                showLogin('กรุณากรอกรหัสพนักงานและรหัสผ่าน');
+                return;
+            }
+            
+            const user = USERS.find(u => u.employeeId === empID && u.password === password);
+            
+            if (user) {
+                isAuthenticated = true;
+                currentUser = user;
+                saveSession(user);
+                navigate('find-friend');
+            } else {
+                showLogin('รหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง');
+            }
+        }
+
+        /**
+         * Show signup page
+         * @param {string} message - Error message to display (optional)
+         */
+        function showSignup(message = '') {
+            renderComponent('', 'logo'); // Clear header and nav
+
+            const foodOptionsHtml = FOOD_OPTIONS.map(food => `
+                <label class="checkbox-label">
+                    <input type="checkbox" class="food-checkbox" value="${food}" onchange="updateFoodSummary()">
+                    <span>${food}</span>
+                </label>
+            `).join('');
+
+            const html = `
+                <div class="page-container" data-page="signup">
+                    <div class="auth-page-logo-container">
+                        <img src="${LOGO_SRC}" alt="Post To Eat Logo">
+                    </div>
+                    <p class="auth-page-slogan">เพราะเราเข้าใจ ว่าคุณ<span style="color: #EE1B24;">หิวข้าว</span></p>
+                    ${message ? `<p class="error">${message}</p>` : ''}
+                    
+                    <div class="form-group">
+                        <label for="signup-name">ชื่อ-นามสกุล</label>
+                        <input type="text" id="signup-name" placeholder="ชื่อจริง นามสกุล" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-employee-id">รหัสพนักงาน</label>
+                        <input type="text" id="signup-employee-id" placeholder="รหัสพนักงานของคุณ" required onkeydown="if(event.key === 'Enter') { document.getElementById('signup-email').focus(); }">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email">อีเมล</label>
+                        <input type="email" id="signup-email" placeholder="อีเมลของคุณ" required onkeydown="if(event.key === 'Enter') { document.getElementById('signup-password').focus(); }">
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-food-preference">อาหารที่คุณชอบ</label>
+                        <div class="food-checkbox-container">
+                            ${foodOptionsHtml}
+                        </div>
+                        <div id="food-summary" class="food-summary" style="display: none;">
+                            <strong>ที่เลือก:</strong> <span id="food-summary-text"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">รหัสผ่าน</label>
+                        <input type="password" id="signup-password" placeholder="ตั้งรหัสผ่าน" required onkeydown="if(event.key === 'Enter') { handleSignup(); }">
+                    </div>
+                    
+                    <button class="btn btn-secondary" onclick="handleSignup()">ลงทะเบียน</button>
+                    <a class="link-text" onclick="showLogin()"><span style="color: #777777;">มีบัญชีอยู่แล้ว?</span> เข้าสู่ระบบ</a>
+                </div>
+            `;
+            appContent.innerHTML = html;
+        }
+
+        /**
+         * Update food preference summary display
+         */
+        function updateFoodSummary() {
+            const checkboxes = document.querySelectorAll('.food-checkbox:checked');
+            const selectedFoods = Array.from(checkboxes).map(cb => cb.value);
+            const summaryDiv = document.getElementById('food-summary');
+            const summaryText = document.getElementById('food-summary-text');
+            
+            if (selectedFoods.length > 0) {
+                summaryText.textContent = selectedFoods.join(', ');
+                summaryDiv.style.display = 'block';
+            } else {
+                summaryDiv.style.display = 'none';
+            }
+        }
+
+        /**
+         * Handle signup submission
+         */
+        function handleSignup() {
+            const nameInput = document.getElementById('signup-name');
+            const employeeIdInput = document.getElementById('signup-employee-id');
+            const emailInput = document.getElementById('signup-email');
+            const passwordInput = document.getElementById('signup-password');
+            const checkboxes = document.querySelectorAll('.food-checkbox:checked');
+            
+            if (!nameInput || !employeeIdInput || !emailInput || !passwordInput) {
+                showSignup('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+                return;
+            }
+            
+            const name = nameInput.value.trim();
+            const employeeId = employeeIdInput.value.trim();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            const selectedFoods = Array.from(checkboxes).map(cb => cb.value);
+            const foodPreference = selectedFoods.join(', ');
+
+            if (!name || !password || !employeeId || !email || selectedFoods.length === 0) {
+                showSignup('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showSignup('กรุณากรอกอีเมลให้ถูกต้อง');
+                return;
+            }
+
+            if (USERS.some(u => u.employeeId === employeeId)) {
+                showSignup('รหัสพนักงานนี้ได้ลงทะเบียนแล้ว');
+                return;
+            }
+
+            if (USERS.some(u => u.email === email)) {
+                showSignup('อีเมลนี้ได้ลงทะเบียนแล้ว');
+                return;
+            }
+
+            USERS.push({ 
+                id: USERS.length + 1, 
+                username: employeeId,
+                password, 
+                name, 
+                employeeId, 
+                foodPreference, 
+                email: email 
+            }); 
+            showLogin('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ');
+        }
+
+        /**
+         * Show restaurants list page
+         */
+        function showRestaurants() {
+            const html = `
+                <div class="page-container" data-page="restaurants">
+                    <input id="restaurant-search-input" type="text" placeholder="ค้นหาร้านอาหารใกล้ไปรษณีย์" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 40px; margin-bottom: 15px;">
+                    <div id="restaurant-list-container" class="restaurant-list"></div>
+                </div>
+            `;
+            renderComponent(html, 'auth', 'restaurants');
+            renderRestaurantList(RESTAURANTS);
+            setupRestaurantSearch();
+        }
+
+        /**
+         * Show find friend/match page
+         */
+        function showFindFriend() {
+            const html = `
+                <div class="page-container" data-page="find-friend">
+                    
+                    <div class="mascot-container">
+                        <img src="${MASCOT_SRC}" alt="Mascot">
+                        <p>รอ<span style="color: #E72733;">เพื่อนไปร</span>กินข้าวด้วยกัน!</p>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="margin-top: 4px; margin-bottom: 20px;" onclick="navigate('new-match')">หาเพื่อนกินข้าวใหม่ตอนนี้</button>
+                    
+                    <input id="friend-search-input" type="text" placeholder="ค้นหาเพื่อนหรือสถานะการนัดหมาย" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 40px; margin-bottom: 15px;">
+                    
+                    <h3 style="color: black; border-bottom: 1px solid #eee; padding-bottom: 5px;">คำขอ/เพื่อนที่สนใจ</h3>
+                    <div id="match-list-container" class="current-matches"></div>
+                </div>
+            `;
+            renderComponent(html, 'auth', 'find-friend');
+            renderMatchList(MATCHES);
+            setupMatchSearch();
+        }
+
+        // --- UTILITY FUNCTIONS ---
+        
+        /**
+         * Format current date/time for datetime-local input
+         * @returns {string} Formatted datetime string (YYYY-MM-DDTHH:mm)
+         */
+        function getCurrentDateTimeString() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+        
+        /**
+         * Format time string (HH:mm)
+         * @returns {string} Formatted time string
+         */
+        function getCurrentTimeString() {
+            const now = new Date();
+            return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        }
+        
+        /**
+         * Format date for Thai locale display
+         * @param {string} datetimeString - ISO datetime string
+         * @returns {string} Formatted date string
+         */
+        function formatDateForDisplay(datetimeString) {
+            const dateObj = new Date(datetimeString);
+            return dateObj.toLocaleDateString('th-TH', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        /**
+         * Show new match request form
+         */
+        function showNewMatch() {
+            const foodOptionsHtml = FOOD_OPTIONS.map(food => `<option value="${food}">${food}</option>`).join('');
+            const minDateTime = getCurrentDateTimeString();
+
+            const html = `
+                <div class="page-container" data-page="new-match">
+                    <h2 style="color: var(--primary-red); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 0px;">หาเพื่อนกินข้าวใหม่ตอนนี้</h2>
+                    <p style="color: var(--text-light-gray); margin-top: 15px;">กรุณากรอกรายละเอียดการนัดหมาย</p>
+                    
+                    <div class="form-group mt-20">
+                        <label for="match-food">ประเภทอาหารที่ต้องการ</label>
+                         <select id="match-food">
+                            <option value="">เลือกประเภทอาหาร</option>
+                            ${foodOptionsHtml}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="match-datetime">วันที่และเวลาที่ต้องการนัด</label>
+                        <input type="datetime-local" id="match-datetime" required min="${minDateTime}">
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="handleNewMatchSubmit()">ส่งคำชวนกินข้าว</button>
+                    <a class="link-text" onclick="navigate('find-friend')">กลับไปที่หน้าหลัก</a>
+                </div>
+            `;
+            renderComponent(html, 'auth', 'find-friend');
+        }
+        
+        /**
+         * Handle new match submission
+         */
+        function handleNewMatchSubmit() {
+            const foodType = document.getElementById('match-food')?.value;
+            const datetime = document.getElementById('match-datetime')?.value;
+            
+            if (!foodType || !datetime) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+            
+            const formattedDate = formatDateForDisplay(datetime);
+            alert(`ส่งคำขอหาคู่แล้ว!\nประเภทอาหาร: ${foodType}\nวันที่และเวลา: ${formattedDate}`);
+            navigate('find-friend');
+        }
+
+        /**
+         * Handle sending chat messages
+         */
+        function handleSendMessage() {
+            const input = document.getElementById('chat-input');
+            if (!input) return;
+            
+            const message = input.value.trim();
+            if (!message || !currentChatId) return;
+            
+            const selectedChat = CHAT_HISTORY.find(c => c.id === currentChatId);
+            if (!selectedChat) return;
+            
+            // Add message to chat history
+            const timeStr = getCurrentTimeString();
+            selectedChat.messages.push({ type: 'sent', text: message, time: timeStr });
+            selectedChat.lastMessage = message;
+            selectedChat.lastMessageTime = timeStr;
+            
+            // Clear input first
+            input.value = '';
+            
+            // Update UI - reload the chat page (this will auto-scroll to bottom)
+            showChat(currentChatId);
+        }
+
+        /**
+         * Show full page chat view
+         * @param {number|null} chatId - Chat ID to display
+         */
+        function showChat(chatId = null) {
+            const chatIdToShow = chatId || currentChatId;
+            if (!chatIdToShow) {
+                navigate('profile');
+                return;
+            }
+            
+            const selectedChat = CHAT_HISTORY.find(c => c.id === chatIdToShow);
+            if (!selectedChat) {
+                navigate('profile');
+                return;
+            }
+            
+            currentChatId = chatIdToShow;
+            
+            const messagesHtml = selectedChat.messages.map(msg => `
+                <div class="message ${msg.type}">
+                    ${msg.text}
+                    <span style="font-size: 0.7em; opacity: 0.7; display: block; margin-top: 4px;">${msg.time}</span>
+                </div>
+            `).join('');
+            
+            const html = `
+                <div class="page-container chat-page-container" data-page="chat">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-shrink: 0;">
+                        <div>
+                            <button onclick="navigate('profile')" style="background: none; border: none; color: var(--primary-red); font-size: 1.2em; cursor: pointer; padding: 5px; margin-right: 10px;">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <span class="chat-name" style="margin: 0;">สนทนา: ${selectedChat.friendName}</span>
+                        </div>
+                    </div>
+                    <div class="chat-box">
+                        ${messagesHtml}
+                    </div>
+                    <div class="chat-input-area" style="margin-top: 15px; flex-shrink: 0;">
+                        <input type="text" id="chat-input" placeholder="พิมพ์ข้อความ..." onkeypress="if(event.key==='Enter') handleSendMessage()">
+                        <button class="btn-send" onclick="handleSendMessage()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            `;
+            renderComponent(html, 'auth', 'chat');
+            
+            // Scroll to bottom after render
+            setTimeout(() => {
+                const chatBox = document.querySelector('.chat-box');
+                if (chatBox) {
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            }, 50);
+            
+            // Also scroll after a slightly longer delay to ensure DOM is fully rendered
+            setTimeout(() => {
+                const chatBox = document.querySelector('.chat-box');
+                if (chatBox) {
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            }, 200);
+        }
+
+        /**
+         * Show profile page with user info and chat history
+         */
+        function showProfile() {
+            // Build chat history list
+            const chatHistoryHtml = CHAT_HISTORY.length > 0 ? CHAT_HISTORY.map(chat => {
+                return `
+                    <div class="chat-history-item" onclick="navigate('chat', ${chat.id})" style="padding: 12px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 8px; cursor: pointer; background: #fff; transition: background 0.2s;" onmouseover="this.style.background='#F8F8F8'" onmouseout="this.style.background='#fff'">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="flex: 1;">
+                                <strong style="color: var(--primary-red);">${chat.friendName}</strong>
+                                <p style="margin: 4px 0 0; font-size: 0.85em; color: var(--text-light-gray); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${chat.lastMessage}</p>
+                            </div>
+                            <span style="font-size: 0.75em; color: var(--text-light-gray); margin-left: 10px;">${chat.lastMessageTime}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('') : '<p style="text-align: center; color: var(--text-light-gray); padding: 20px;">ยังไม่มีประวัติการแชท</p>';
+            
+            const html = `
+                <div class="page-container" data-page="profile">
+                    <h2 style="color: var(--primary-red); border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 0px;">โปรไฟล์ของฉัน</h2>
+                    
+                    <div class="profile-card" style="text-align: center;">
+                        <i class="fas fa-user-circle" style="color: #162067;"></i>
+                        <h3 style="margin: 8px 0;">${currentUser.name}</h3>
+                        <p style="color: var(--text-light-gray); margin-top: 8px;">รหัสพนักงาน: ${currentUser.employeeId}</p>
+                    </div>
+
+                    <div class="profile-section" style="text-align: left;">
+                        <h3>ข้อมูลส่วนตัว</h3>
+                        <div class="profile-detail">
+                            <label>อาหารที่คุณชอบ</label>
+                            <p>${currentUser.foodPreference}</p>
+                        </div>
+                        <div class="profile-detail">
+                            <label>อีเมล</label>
+                            <p>${currentUser.email || 'ยังไม่ได้ตั้งค่า'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h3>ประวัติการแชท</h3>
+                        <div id="chat-history-list">
+                            ${chatHistoryHtml}
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-secondary" style="margin-top: 15px;" onclick="alert('อยู่ในระหว่างการพัฒนา')">แก้ไขโปรไฟล์</button>
+                </div>
+            `;
+            renderComponent(html, 'auth', 'profile');
+        }
+        
+        /**
+         * Open chat conversation by ID
+         * @param {number} chatId - The chat ID to open
+         */
+        function openChat(chatId) {
+            if (!chatId) return;
+            navigate('chat', chatId);
+        }
+
+        // --- 7. NAVIGATION and FLOW CONTROL ---
+
+        /**
+         * @function navigate
+         * @description Main navigation function to switch between components.
+         */
+        function navigate(page, param = null) {
+            if (!isAuthenticated && page !== 'login' && page !== 'signup') {
+                showLogin('กรุณาเข้าสู่ระบบก่อน');
+                return;
+            }
+
+            switch (page) {
+                case 'login':
+                    showLogin();
+                    break;
+                case 'signup':
+                    showSignup();
+                    break;
+                case 'find-friend':
+                    showFindFriend();
+                    break;
+                case 'new-match':
+                    showNewMatch();
+                    break;
+                case 'restaurants':
+                    showRestaurants();
+                    break;
+                case 'chat':
+                    showChat(param);
+                    break;
+                case 'profile':
+                    showProfile();
+                    break;
+                default:
+                    showLogin();
+            }
+        }
+
+        /**
+         * Handle user logout
+         */
+        function handleLogout() {
+            clearSession();
+            navigate('login');
+        }
+
+        // ============================================
+        // 8. INITIALIZATION
+        // ============================================
+        
+        /**
+         * Initialize application on page load
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Try to restore session from localStorage
+            if (loadSession()) {
+                // Session restored, navigate to default page
+                navigate('find-friend');
+            } else {
+                // No valid session, show login
+            navigate('login');
+            }
+            
+            // Setup activity tracking and session monitoring
+            setupActivityTracking();
+            startSessionMonitor();
+        });
+    </script>
+</body>
+</html>
