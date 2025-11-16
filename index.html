@@ -575,9 +575,9 @@
         ];
 
         // Match Data (for "หาเพื่อนกินข้าว" tab)
-        const MATCHES = [
-            { id: 101, requester: 'สมชาย สุขจะกิน', code: 'XXX', foodPreference: 'อาหารญี่ปุ่น, อาหารเกาหลี', status: 'รอนัดหมาย' },
-            { id: 102, requester: 'หญิงรัตน์ หวังกิน', code: 'YYY', foodPreference: 'ของหวาน, อาหารไทย, อาหารอิตาเลียน', status: 'นัดหมายแล้ว' }
+        let MATCHES = [
+            { id: 101, requester: 'สมชาย สุขจะกิน', requesterId: 999, requestedFood: 'อาหารญี่ปุ่น', foodPreference: 'อาหารญี่ปุ่น, อาหารเกาหลี', status: 'รอนัดหมาย', datetime: null },
+            { id: 102, requester: 'หญิงรัตน์ หวังกิน', requesterId: 998, requestedFood: 'ของหวาน', foodPreference: 'ของหวาน, อาหารไทย, อาหารอิตาเลียน', status: 'นัดหมายแล้ว', datetime: null }
         ];
 
         // Chat History Data
@@ -810,6 +810,41 @@
         }
 
         /**
+         * Filter matches based on current user's food preferences
+         * Only show matches where the requested food type matches user's preferences
+         * @returns {Array} Filtered matches
+         */
+        function getFilteredMatches() {
+            if (!currentUser || !currentUser.foodPreference) {
+                return MATCHES;
+            }
+            
+            const userPreferences = currentUser.foodPreference.split(',').map(p => p.trim());
+            
+            return MATCHES.filter(match => {
+                // Don't show user's own match requests
+                if (match.requesterId === currentUser.id) {
+                    return false;
+                }
+                
+                // Check if the requested food type matches any of user's preferences
+                if (match.requestedFood) {
+                    return userPreferences.some(pref => pref === match.requestedFood);
+                }
+                
+                // Fallback: check if any food preference overlaps
+                if (match.foodPreference) {
+                    const matchPreferences = match.foodPreference.split(',').map(p => p.trim());
+                    return userPreferences.some(userPref => 
+                        matchPreferences.some(matchPref => userPref === matchPref)
+                    );
+                }
+                
+                return false;
+            });
+        }
+
+        /**
          * Render match list into container
          * @param {Array} matches - Matches to render
          */
@@ -833,10 +868,12 @@
                     buttonHtml = `<button style="background: var(--primary-red); color: white; border: none; padding: 5px 10px; border-radius: 20px; font-size: 0.7em; margin-top: 5px; cursor: pointer;" onclick="navigate('new-match')">หาคู่กินข้าว</button>`;
                 }
 
+                const requestedFoodDisplay = m.requestedFood ? `<span style="font-size: 0.75em; color: var(--primary-red);">ต้องการ: ${m.requestedFood}</span><br>` : '';
                 return `
                     <div class="match-item">
                         <div>
                             <span class="friend-name">${m.requester}</span> <br>
+                            ${requestedFoodDisplay}
                             <span style="font-size: 0.8em;">ชอบ: ${m.foodPreference}</span>
                         </div>
                         <div style="text-align: right;">
@@ -858,16 +895,19 @@
 
             searchInput.addEventListener('input', (event) => {
                 const query = event.target.value.toLowerCase().trim();
+                const filteredMatches = getFilteredMatches();
+                
                 if (!query) {
-                    renderMatchList(MATCHES);
+                    renderMatchList(filteredMatches);
                     return;
                 }
 
-                const filtered = MATCHES.filter(m => {
+                const filtered = filteredMatches.filter(m => {
                     const requester = m.requester ? m.requester.toLowerCase() : '';
                     const preference = m.foodPreference ? m.foodPreference.toLowerCase() : '';
+                    const requestedFood = m.requestedFood ? m.requestedFood.toLowerCase() : '';
                     const status = m.status ? m.status.toLowerCase() : '';
-                    return requester.includes(query) || preference.includes(query) || status.includes(query);
+                    return requester.includes(query) || preference.includes(query) || requestedFood.includes(query) || status.includes(query);
                 });
                 renderMatchList(filtered);
             });
@@ -1102,7 +1142,8 @@
                 </div>
             `;
             renderComponent(html, 'auth', 'find-friend');
-            renderMatchList(MATCHES);
+            const filteredMatches = getFilteredMatches();
+            renderMatchList(filteredMatches);
             setupMatchSearch();
         }
 
@@ -1190,8 +1231,28 @@
                 return;
             }
             
+            if (!currentUser) {
+                alert('เกิดข้อผิดพลาด กรุณาเข้าสู่ระบบอีกครั้ง');
+                return;
+            }
+            
+            // Create new match request
+            const newMatchId = Math.max(...MATCHES.map(m => m.id), 100) + 1;
+            const newMatch = {
+                id: newMatchId,
+                requester: currentUser.name,
+                requesterId: currentUser.id,
+                requestedFood: foodType,
+                foodPreference: currentUser.foodPreference,
+                status: 'รอนัดหมาย',
+                datetime: datetime
+            };
+            
+            // Add to MATCHES array
+            MATCHES.push(newMatch);
+            
             const formattedDate = formatDateForDisplay(datetime);
-            alert(`ส่งคำขอหาคู่แล้ว!\nประเภทอาหาร: ${foodType}\nวันที่และเวลา: ${formattedDate}`);
+            alert(`ส่งคำขอหาคู่แล้ว!\nประเภทอาหาร: ${foodType}\nวันที่และเวลา: ${formattedDate}\n\nคำขอของคุณจะแสดงให้ผู้ใช้ที่มีความสนใจใน${foodType}เท่านั้น`);
             navigate('find-friend');
         }
 
